@@ -18,6 +18,7 @@ com\booking\appointment\util\DateTimeUtil.class
 com\booking\appointment\dao\TimeSlotTemplateDAO.class
 com\booking\appointment\dao\BreakTimeDAO.class
 com\booking\appointment\dao\WorkingHoursDAO.class
+com\booking\appointment\controller\AdminApiController.class
 com\booking\appointment\model\WorkingHours.class
 com\booking\appointment\service\UserService.class
 com\booking\appointment\dao\impl\AppSettingDAOImpl.class
