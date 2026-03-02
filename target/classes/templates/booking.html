@@ -236,25 +236,25 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="firstName">First Name *</label>
-                        <input type="text" id="firstName" name="firstName" required>
+                        <input type="text" id="firstName" name="firstName" maxlength="50" pattern="[A-Za-z\s'-]{2,50}" required>
                         <div class="error-message"></div>
                     </div>
                     <div class="form-group">
                         <label for="lastName">Last Name *</label>
-                        <input type="text" id="lastName" name="lastName" required>
+                        <input type="text" id="lastName" name="lastName" maxlength="50" pattern="[A-Za-z\s'-]{2,50}" required>
                         <div class="error-message"></div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email Address *</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" maxlength="120" required>
                     <div class="error-message"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone">
+                    <input type="tel" id="phone" name="phone" maxlength="15" pattern="\d{10,15}">
                     <div class="error-message"></div>
                 </div>
             </div>
@@ -266,12 +266,12 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="make">Make *</label>
-                        <input type="text" id="make" name="make" required>
+                        <input type="text" id="make" name="make" maxlength="50" required>
                         <div class="error-message"></div>
                     </div>
                     <div class="form-group">
                         <label for="model">Model *</label>
-                        <input type="text" id="model" name="model" required>
+                        <input type="text" id="model" name="model" maxlength="50" required>
                         <div class="error-message"></div>
                     </div>
                 </div>
@@ -284,13 +284,13 @@
                     </div>
                     <div class="form-group">
                         <label for="color">Color</label>
-                        <input type="text" id="color" name="color">
+                        <input type="text" id="color" name="color" maxlength="30">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="licensePlate">License Plate *</label>
-                    <input type="text" id="licensePlate" name="licensePlate" placeholder="e.g., ABC123" required>
+                    <input type="text" id="licensePlate" name="licensePlate" placeholder="e.g., ABC123" maxlength="20" pattern="[A-Za-z0-9-]{3,20}" required>
                     <div class="error-message"></div>
                 </div>
             </div>
@@ -322,7 +322,7 @@
 
                 <div class="form-group">
                     <label for="notes">Additional Notes</label>
-                    <textarea id="notes" name="notes" placeholder="Any special requirements or information..."></textarea>
+                    <textarea id="notes" name="notes" maxlength="500" placeholder="Any special requirements or information..."></textarea>
                 </div>
             </div>
 
@@ -363,17 +363,37 @@
 
         // Validate form
         function validateForm() {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
 
             if (!firstName || !lastName || !email) {
                 alert('Please fill in all required personal information');
                 return false;
             }
 
+            if (!/^[A-Za-z\s'-]{2,50}$/.test(firstName) || !/^[A-Za-z\s'-]{2,50}$/.test(lastName)) {
+                alert('Names must be 2-50 characters and contain only letters, spaces, apostrophes, or hyphens');
+                return false;
+            }
+
             if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
                 alert('Please enter a valid email address');
+                return false;
+            }
+
+            if (!appointmentDate || !appointmentTime) {
+                alert('Please select both appointment date and time');
+                return false;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(appointmentDate + 'T00:00:00');
+            if (selectedDate < today) {
+                alert('Appointment date cannot be in the past');
                 return false;
             }
 

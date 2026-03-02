@@ -1,29 +1,73 @@
 package com.booking.appointment.controller;
 
 import com.booking.appointment.util.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminApiController {
 
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9._-]{3,50}$");
+
+    private final ConcurrentMap<String, FailedLoginState> failedLogins = new ConcurrentHashMap<>();
+
+    @Value("${admin.auth.username:admin}")
+    private String configuredUsername;
+
+    @Value("${admin.auth.password:admin123}")
+    private String configuredPassword;
+
+    @Value("${admin.auth.max-failed-attempts:5}")
+    private int maxFailedAttempts;
+
+    @Value("${admin.auth.lock-minutes:15}")
+    private long lockMinutes;
+
     @PostMapping("/login")
-    public ApiResponse<Map<String, Object>> login(@RequestBody Map<String, String> payload) {
-        String username = payload.getOrDefault("username", "").trim();
-        String password = payload.getOrDefault("password", "").trim();
+    public ApiResponse<Map<String, Object>> login(@RequestBody(required = false) Map<String, String> payload,
+                                                  HttpServletRequest request) {
+        if (payload == null) {
+            return ApiResponse.error("Invalid request payload", 400);
+        }
+
+        String username = normalize(payload.get("username"));
+        String password = normalize(payload.get("password"));
+        String clientKey = resolveClientKey(request);
+
+        if (isClientLocked(clientKey)) {
+            return ApiResponse.error("Too many failed attempts. Try again later.", 429);
+        }
 
         if (username.isEmpty() || password.isEmpty()) {
             return ApiResponse.error("Username and password are required", 400);
         }
 
-        if ("admin".equals(username) && "admin123".equals(password)) {
+        if (!isValidUsername(username)) {
+            return ApiResponse.error("Invalid username format", 400);
+        }
+
+        if (password.length() < 8 || password.length() > 128) {
+            return ApiResponse.error("Invalid password format", 400);
+        }
+
+        if (constantTimeEquals(configuredUsername, username)
+            && constantTimeEquals(configuredPassword, password)) {
+            failedLogins.remove(clientKey);
             Map<String, Object> adminData = Map.of(
                 "adminId", 1,
                 "username", username,
@@ -32,6 +76,7 @@ public class AdminApiController {
             return ApiResponse.success("Login successful", adminData);
         }
 
+        registerFailedAttempt(clientKey);
         return ApiResponse.error("Invalid username or password", 401);
     }
 
@@ -43,5 +88,58 @@ public class AdminApiController {
             "date", LocalDate.now().toString()
         );
         return ApiResponse.success("Dashboard statistics retrieved", stats);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private boolean isValidUsername(String username) {
+        return USERNAME_PATTERN.matcher(username).matches();
+    }
+
+    private boolean constantTimeEquals(String expected, String actual) {
+        byte[] expectedBytes = expected.getBytes(StandardCharsets.UTF_8);
+        byte[] actualBytes = actual.getBytes(StandardCharsets.UTF_8);
+        return MessageDigest.isEqual(expectedBytes, actualBytes);
+    }
+
+    private String resolveClientKey(HttpServletRequest request) {
+        String forwardedFor = request.getHeader("X-Forwarded-For");
+        if (forwardedFor != null && !forwardedFor.isBlank()) {
+            return forwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
+    }
+
+    private void registerFailedAttempt(String clientKey) {
+        failedLogins.compute(clientKey, (key, current) -> {
+            FailedLoginState state = current == null ? new FailedLoginState() : current;
+            state.failedCount++;
+            if (state.failedCount >= maxFailedAttempts) {
+                state.lockUntil = LocalDateTime.now().plusMinutes(lockMinutes);
+                state.failedCount = 0;
+            }
+            return state;
+        });
+    }
+
+    private boolean isClientLocked(String clientKey) {
+        FailedLoginState state = failedLogins.get(clientKey);
+        if (state == null || state.lockUntil == null) {
+            return false;
+        }
+
+        if (LocalDateTime.now().isAfter(state.lockUntil)) {
+            failedLogins.remove(clientKey);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static class FailedLoginState {
+        private int failedCount;
+        private LocalDateTime lockUntil;
     }
 }

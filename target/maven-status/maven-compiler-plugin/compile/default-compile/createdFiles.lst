@@ -30,6 +30,7 @@ com\booking\appointment\model\Appointment.class
 com\booking\appointment\util\ApiResponse.class
 com\booking\appointment\controller\AdminController.class
 com\booking\appointment\controller\AdminController$1.class
+com\booking\appointment\controller\AdminApiController$FailedLoginState.class
 com\booking\appointment\config\DatabaseConfig.class
 com\booking\appointment\util\ValidationUtil.class
 com\booking\appointment\service\HolidayService.class
