@@ -268,11 +268,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Store admin info in session
-                    sessionStorage.setItem('adminToken', data.data.adminId);
+                    sessionStorage.setItem('adminToken', data.data.token);
                     sessionStorage.setItem('adminUsername', data.data.username);
-                    
-                    // Redirect to admin dashboard
                     window.location.href = '/admin/dashboard';
                 } else {
                     showError(data.message || 'Login failed');

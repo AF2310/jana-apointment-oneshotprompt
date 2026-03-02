@@ -11,9 +11,9 @@ import java.sql.SQLException;
  */
 public class DatabaseConfig {
     
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/appointment_booking_db";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "";
+    private static final String DB_URL = System.getenv().getOrDefault("DB_URL", "jdbc:mysql://localhost:3306/appointment_booking_db");
+    private static final String DB_USER = System.getenv().getOrDefault("DB_USERNAME", "root");
+    private static final String DB_PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "");
     private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     
     static {

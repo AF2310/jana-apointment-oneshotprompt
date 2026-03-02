@@ -447,33 +447,61 @@
     </div>
 
     <script>
-        // Load admin info
+        function getAdminToken() {
+            return sessionStorage.getItem('adminToken') || '';
+        }
+
+        function ensureAuthenticated() {
+            const token = getAdminToken();
+            if (!token) {
+                window.location.href = '/admin/login';
+                return false;
+            }
+            return true;
+        }
+
         function loadAdminInfo() {
             const adminName = sessionStorage.getItem('adminUsername');
             document.getElementById('adminName').textContent = adminName || 'Admin User';
         }
 
-        // Logout
         function logout() {
-            sessionStorage.clear();
-            window.location.href = '/admin/login';
+            const token = getAdminToken();
+            fetch('/api/admin/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).finally(() => {
+                sessionStorage.clear();
+                window.location.href = '/admin/login';
+            });
         }
 
-        // Load dashboard stats
         function loadDashboardStats() {
-            fetch('/api/admin/dashboard/stats')
+            const token = getAdminToken();
+            fetch('/api/admin/dashboard/stats', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         document.getElementById('totalAppointments').textContent = data.data.totalAppointments;
                         document.getElementById('todayAppointments').textContent = data.data.todayAppointments;
+                    } else if (data.statusCode === 401) {
+                        sessionStorage.clear();
+                        window.location.href = '/admin/login';
                     }
                 })
                 .catch(error => console.error('Error loading stats:', error));
         }
 
-        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            if (!ensureAuthenticated()) {
+                return;
+            }
             loadAdminInfo();
             loadDashboardStats();
         });

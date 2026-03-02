@@ -446,7 +446,7 @@ curl -X DELETE http://localhost:8080/api/appointments/1
 ```json
 {
   "username": "admin",
-  "password": "admin123"
+  "password": "<admin-password-from-env>"
 }
 ```
 
@@ -482,7 +482,7 @@ curl -X POST http://localhost:8080/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
-    "password": "admin123"
+    "password": "<admin-password-from-env>"
   }'
 ```
 
@@ -976,7 +976,7 @@ const loginResponse = await fetch('/api/admin/login', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     username: 'admin',
-    password: 'admin123'
+    password: '<admin-password-from-env>'
   })
 });
 

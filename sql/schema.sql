@@ -277,7 +277,7 @@ INSERT INTO time_slot_templates (start_time, end_time, is_active) VALUES
 ('17:30:00', '17:45:00', TRUE),
 ('17:45:00', '18:00:00', TRUE);
 
--- Insert Default Admin User (username: admin, password: admin123)
+-- Insert default admin user (username: admin, password hash pre-generated)
 INSERT INTO admin_users (username, password, email, full_name, is_active) VALUES
 ('admin', '$2a$10$slYQmyNdGzins1d6lJU5C.6JzVmJdYwGhFqpg0sL.aKXn0GrEGbTq', 'admin@example.com', 'System Administrator', TRUE);
 

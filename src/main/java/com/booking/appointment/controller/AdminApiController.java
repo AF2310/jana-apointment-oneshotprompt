@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,9 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 @RestController
@@ -25,11 +27,12 @@ public class AdminApiController {
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9._-]{3,50}$");
 
     private final ConcurrentMap<String, FailedLoginState> failedLogins = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, SessionState> sessions = new ConcurrentHashMap<>();
 
     @Value("${admin.auth.username:admin}")
     private String configuredUsername;
 
-    @Value("${admin.auth.password:admin123}")
+    @Value("${admin.auth.password:}")
     private String configuredPassword;
 
     @Value("${admin.auth.max-failed-attempts:5}")
@@ -37,6 +40,9 @@ public class AdminApiController {
 
     @Value("${admin.auth.lock-minutes:15}")
     private long lockMinutes;
+
+    @Value("${admin.auth.session-minutes:30}")
+    private long sessionMinutes;
 
     @PostMapping("/login")
     public ApiResponse<Map<String, Object>> login(@RequestBody(required = false) Map<String, String> payload,
@@ -65,13 +71,21 @@ public class AdminApiController {
             return ApiResponse.error("Invalid password format", 400);
         }
 
+        if (configuredPassword == null || configuredPassword.isBlank()) {
+            return ApiResponse.error("Admin authentication is not configured", 503);
+        }
+
         if (constantTimeEquals(configuredUsername, username)
             && constantTimeEquals(configuredPassword, password)) {
             failedLogins.remove(clientKey);
+            String sessionToken = UUID.randomUUID().toString();
+            sessions.put(sessionToken, new SessionState(username, LocalDateTime.now().plusMinutes(sessionMinutes)));
+
             Map<String, Object> adminData = Map.of(
                 "adminId", 1,
                 "username", username,
-                "fullName", "System Administrator"
+                "fullName", "System Administrator",
+                "token", sessionToken
             );
             return ApiResponse.success("Login successful", adminData);
         }
@@ -80,8 +94,24 @@ public class AdminApiController {
         return ApiResponse.error("Invalid username or password", 401);
     }
 
+    @PostMapping("/logout")
+    public ApiResponse<String> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        String token = extractBearerToken(authorization);
+        if (!token.isEmpty()) {
+            sessions.remove(token);
+        }
+        return ApiResponse.success("Logged out", "");
+    }
+
     @GetMapping("/dashboard/stats")
-    public ApiResponse<Map<String, Object>> dashboardStats() {
+    public ApiResponse<Map<String, Object>> dashboardStats(
+        @RequestHeader(value = "Authorization", required = false) String authorization) {
+
+        String token = extractBearerToken(authorization);
+        if (!isSessionValid(token)) {
+            return ApiResponse.error("Unauthorized", 401);
+        }
+
         Map<String, Object> stats = Map.of(
             "totalAppointments", 0,
             "todayAppointments", 0,
@@ -138,8 +168,43 @@ public class AdminApiController {
         return true;
     }
 
+    private String extractBearerToken(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return "";
+        }
+        return authorization.substring(7).trim();
+    }
+
+    private boolean isSessionValid(String token) {
+        if (token.isEmpty()) {
+            return false;
+        }
+
+        SessionState session = sessions.get(token);
+        if (session == null) {
+            return false;
+        }
+
+        if (LocalDateTime.now().isAfter(session.expiresAt)) {
+            sessions.remove(token);
+            return false;
+        }
+
+        return true;
+    }
+
     private static class FailedLoginState {
         private int failedCount;
         private LocalDateTime lockUntil;
+    }
+
+    private static class SessionState {
+        private final String username;
+        private final LocalDateTime expiresAt;
+
+        private SessionState(String username, LocalDateTime expiresAt) {
+            this.username = username;
+            this.expiresAt = expiresAt;
+        }
     }
 }

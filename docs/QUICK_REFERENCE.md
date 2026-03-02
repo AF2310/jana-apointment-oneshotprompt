@@ -34,7 +34,7 @@ mvn spring-boot:run
 
 # 6. Access application
 # User: http://localhost:8080/
-# Admin: http://localhost:8080/admin/login (admin/admin123)
+# Admin: http://localhost:8080/admin/login (credentials configured via environment)
 ```
 
 ### For DevOps
@@ -290,7 +290,7 @@ curl -X POST http://localhost:8080/api/appointments/book -d '...'
 ```
 Email: test@example.com
 Admin Username: admin
-Admin Password: admin123
+Admin Password: <admin-password-from-env>
 ```
 
 ---

@@ -269,7 +269,7 @@ curl -X POST http://localhost:8080/api/admin/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
-    "password": "admin123"
+    "password": "<admin-password-from-env>"
   }'
 ```
 

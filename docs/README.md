@@ -272,7 +272,7 @@ The application will start on `http://localhost:8080`
 
 - **User Booking**: http://localhost:8080/booking.html
 - **Admin Login**: http://localhost:8080/admin/login
-  - Default credentials: `admin` / `admin123`
+  - Configure credentials via environment variables before login
 - **Admin Dashboard**: http://localhost:8080/admin/dashboard
 
 ---
@@ -607,7 +607,7 @@ POST /admin/login
 Request Body:
 {
   "username": "admin",
-  "password": "admin123"
+  "password": "<admin-password-from-env>"
 }
 
 Response:
@@ -781,10 +781,10 @@ For questions or issues:
 
 ##### 1. First-Time Login
 - URL: `http://localhost:8080/admin/login`
-- Default Credentials:
-  - Username: `admin`
-  - Password: `admin123`
-- **⚠️ IMPORTANT**: Change the default password immediately after first login
+- Admin Credentials:
+  - Username: `admin` (or configured value)
+  - Password: configured via environment variable
+- **⚠️ IMPORTANT**: Do not store passwords directly in text files
 
 ##### 2. Configure System Settings
 1. Log in to admin dashboard
