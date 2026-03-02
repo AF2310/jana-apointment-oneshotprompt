@@ -367,3 +367,28 @@ Identify and stop the process that's listening on port 8080 or configure this ap
 2026-03-02T14:47:49.827+01:00  INFO 39940 --- [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-03-02T14:47:49.828+01:00  INFO 39940 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-03-02T14:47:49.830+01:00  INFO 39940 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-03-02T14:49:40.662+01:00  INFO 29016 --- [main] c.b.a.AppointmentBookingApplication      : Starting AppointmentBookingApplication using Java 23.0.1 with PID 29016 (C:\Users\moner\copilotapp\AppointmentBooking\target\classes started by moner in c:\Users\moner\copilotapp\AppointmentBooking)
+2026-03-02T14:49:40.665+01:00 DEBUG 29016 --- [main] c.b.a.AppointmentBookingApplication      : Running with Spring Boot v3.1.5, Spring v6.0.13
+2026-03-02T14:49:40.666+01:00  INFO 29016 --- [main] c.b.a.AppointmentBookingApplication      : No active profile set, falling back to 1 default profile: "default"
+2026-03-02T14:49:41.693+01:00  INFO 29016 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-02T14:49:41.726+01:00  INFO 29016 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 25 ms. Found 0 JPA repository interfaces.
+2026-03-02T14:49:42.630+01:00  INFO 29016 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2026-03-02T14:49:42.652+01:00  INFO 29016 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-02T14:49:42.653+01:00  INFO 29016 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.15]
+2026-03-02T14:49:42.864+01:00  INFO 29016 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-03-02T14:49:42.865+01:00  INFO 29016 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2055 ms
+2026-03-02T14:49:43.111+01:00  INFO 29016 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-02T14:49:43.174+01:00  INFO 29016 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.13.Final
+2026-03-02T14:49:43.178+01:00  INFO 29016 --- [main] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2026-03-02T14:49:43.523+01:00  INFO 29016 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-02T14:49:43.561+01:00  INFO 29016 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-02T14:49:43.796+01:00  INFO 29016 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@446b64b3
+2026-03-02T14:49:43.799+01:00  INFO 29016 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-02T14:49:43.831+01:00  WARN 29016 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-02T14:49:43.833+01:00  WARN 29016 --- [main] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2026-03-02T14:49:44.286+01:00  INFO 29016 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-02T14:49:44.294+01:00  INFO 29016 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-02T14:49:44.356+01:00  WARN 29016 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-02T14:49:44.552+01:00  INFO 29016 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@77ce8bc5, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2fcc5f49, org.springframework.security.web.context.SecurityContextHolderFilter@6ec3a4c2, org.springframework.security.web.header.HeaderWriterFilter@a6dffdb, org.springframework.security.web.authentication.logout.LogoutFilter@75d539b9, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2b6b487c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@c4551c6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@28e48b65, org.springframework.security.web.access.ExceptionTranslationFilter@29699283, org.springframework.security.web.access.intercept.AuthorizationFilter@311d28f5]
+2026-03-02T14:49:45.137+01:00  INFO 29016 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2026-03-02T14:49:45.146+01:00  INFO 29016 --- [main] c.b.a.AppointmentBookingApplication      : Started AppointmentBookingApplication in 5.023 seconds (process running for 5.54)
